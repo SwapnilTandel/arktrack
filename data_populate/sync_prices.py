@@ -14,7 +14,7 @@ if exists(LOG_FILE):
     lfile.truncate()
     lfile.close()
 
-logging.basicConfig(filename=LOG_FILE, filemode='a', level=logging.DEBUG)
+logging.basicConfig(filename=LOG_FILE, filemode='a', level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 connection = psycopg2.connect(host=config.DB_HOST, database=config.DB_NAME, user=config.DB_USER, password=config.DB_PASS)
@@ -23,12 +23,12 @@ cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 def get_all_stocks(start_date, end_date):
     rtn_stocks = []
-    cursor.execute(f"SELECT * FROM stock WHERE id IN (SELECT holding_id FROM etf_holding) and day(date) between "
-                   f"{start_date} and {end_date}")
+    cursor.execute(f"SELECT id, symbol FROM stock WHERE id IN (SELECT holding_id FROM etf_holding)")
     stocks = cursor.fetchall()
 
     for stock in stocks:
-        cursor.execute(f"SELECT * FROM stock_price WHERE stock_id={stock['id']} limit 1")
+        cursor.execute(f"SELECT * FROM stock_price WHERE stock_id={stock['id']} and date(dt) between '"
+                       f"{start_date}' and '{end_date}' limit 1;")
         if 0 == cursor.rowcount:
             rtn_stocks.append((stock['symbol'], stock['id']))
     return rtn_stocks
@@ -41,7 +41,7 @@ def load_data(symb, stock_id, start_date, end_date):
     response = json.loads(resp.content)
     if not response:
         # print(f'Response is empty for {symb}')
-        logger.debug(f'{symb}::Failed to fetch data.')
+        logger.error(f'{symb}::Failed to fetch data.')
         return
     print(f'Data INSERT for {symb}')
 
