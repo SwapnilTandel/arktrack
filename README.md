@@ -18,7 +18,7 @@ Get the bash
 docker exec -it <CONTAINER_ID> /bin/bash
 ```
 
-## JupyterNode on Docker
+## JupyterNotebook on Docker
 ```
 ARG BASE_CONTAINER=jupyter/minimal-notebook
 FROM $BASE_CONTAINER
