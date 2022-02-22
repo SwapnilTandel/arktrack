@@ -61,11 +61,9 @@ def load_data(symb, stock_id, start_date, end_date):
 def main():
     start_date, end_date = '2022-02-15', '2022-02-17'
     to_query = get_all_stocks(start_date, end_date)
-    # print(to_query[:1])
+
     for sym, id in to_query:
         load_data(sym, id, '2022-02-15', '2022-02-17')
-
-    # print(to_query)
 
 
 main()
